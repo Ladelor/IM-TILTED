@@ -1,26 +1,28 @@
-package com.example.mcmorrisgray.imtilted;
+package com.example.mcmorris.imtilted;
 
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
 /**
  * Created by Josh on 2/13/2018.
+ * Class to override base Java Thread
+ * TODO: Handle frame rate stuff
  */
 
 public class MainThread extends Thread {
     public static final int FPS = 30;
-    private SurfaceHolder surfaceHolder;
+    private final SurfaceHolder surfaceHolder;
     private GameContent gameContent;
     private boolean running;
-    public static Canvas canvas;
+    private static Canvas canvas;
 
-    public MainThread(SurfaceHolder surfaceHolder, GameContent gameContent) {
+    MainThread(SurfaceHolder surfaceHolder, GameContent gameContent) {
         super();
         this.surfaceHolder = surfaceHolder;
         this.gameContent = gameContent;
     }
 
-    public void setRunning(boolean running) {
+    void setRunning(boolean running) {
         this.running = running;
     }
 
@@ -28,7 +30,7 @@ public class MainThread extends Thread {
     public void run() {
         long startTime;
         while(running) {
-            startTime = System.nanoTime();
+            //startTime = System.nanoTime();
 
             try {
                 canvas = this.surfaceHolder.lockCanvas();

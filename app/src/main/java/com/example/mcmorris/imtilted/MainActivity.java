@@ -9,10 +9,13 @@ import android.view.WindowManager;
 
 public class MainActivity extends AppCompatActivity {
 
+    private GameContent gameContent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main );
+
+        gameContent = findViewById(R.id.GameContent);
     }
 
     @Override
@@ -29,4 +32,19 @@ public class MainActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        gameContent.tiltManager.stop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        gameContent.tiltManager.start();
+        gameContent.player.resetTime();
+    }
+
+
 }

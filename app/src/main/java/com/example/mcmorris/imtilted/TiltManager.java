@@ -1,4 +1,4 @@
-package com.example.mcmorrisgray.imtilted;
+package com.example.mcmorris.imtilted;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -8,41 +8,48 @@ import android.hardware.SensorManager;
 
 /**
  * Created by Josh on 2/27/2018.
+ * Manages the Tilt
+ * TODO: Potential improve efficiency, research delays
  */
 
 public class TiltManager implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor accelSensor;
     private Sensor magSensor;
-    float accelValues[] = new float[9];
-    float magValues[] = new float[9];
+    private float accelValues[] = new float[9];
+    private float magValues[] = new float[9];
 
-    public float[] getTilt() {
+    float[] getTilt() {
         return tilt;
     }
 
     private float[] tilt = new float[3];
 
-    public float[] getInitialTilt() {
+    float[] getInitialTilt() {
         return initialTilt;
     }
 
     private float[] initialTilt = null;
 
-    public TiltManager(Context context) {
+    TiltManager(Context context) {
         sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        magSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        try {
+            accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            magSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        } catch(java.lang.NullPointerException e) {
+            //Like log something or literally do anything to tell the user they can't play this game
+            //Or just give them button controls
+        }
     }
 
-    public void start() {
+    void start() {
         sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, magSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
     //USE THIS IF GAME PAUSED
     //DON'T MAKE PHONE KEEP DOING THIS
-    public void stop() {
+    void stop() {
         sensorManager.unregisterListener(this);
     }
 
