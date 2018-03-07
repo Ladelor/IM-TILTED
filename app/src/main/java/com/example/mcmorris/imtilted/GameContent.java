@@ -28,7 +28,6 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     public TiltManager tiltManager;
     public PathObject path;
 
-
     private double pathDisplacement;
     private int pathPeriod;
     private int pathDetail;
@@ -58,8 +57,8 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         pathDisplacement = 0;
         pathPeriod = 150;       //TODO make this depend on screen pixel count
         pathDetail = 1;
-        pathWidth = (int) (Constants.screenWidth / 5.0);
-        pathSineOffset = (int) (Constants.screenWidth / 20.0);
+        pathWidth = (int) (Constants.screenWidth / 7.0);
+        pathSineOffset = (int) (Constants.screenWidth / 5.0);
 
         //Initialize a new Paint instance to draw the path
         pathPaint = new Paint();
@@ -109,7 +108,6 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void draw(Canvas canvas) {
-        Log.d("draw: ", "we got to draw!");
         super.draw(canvas);
         canvas.drawColor(0xff999999);
 
