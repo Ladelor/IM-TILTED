@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -24,6 +26,16 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     private MainThread thread;
     public Player player;
     public TiltManager tiltManager;
+    public PathObject path;
+
+
+    private double pathDisplacement;
+    private int pathPeriod;
+    private int pathDetail;
+    private int pathWidth;
+    private int pathSineOffset;
+    private Paint pathPaint;
+
 
     public GameContent(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -41,6 +53,21 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         Constants.screenHeight = Constants.displayMetrics.heightPixels;
         Constants.screenWidth = Constants.displayMetrics.widthPixels;
         player = new Player(new Point((Constants.screenWidth / 2), Constants.screenHeight - Constants.convertPxToDp(150)), tiltManager);
+
+        //Initialize path data
+        pathDisplacement = 0;
+        pathPeriod = 150;       //TODO make this depend on screen pixel count
+        pathDetail = 1;
+        pathWidth = (int) (Constants.screenWidth / 5.0);
+        pathSineOffset = (int) (Constants.screenWidth / 20.0);
+
+        //Initialize a new Paint instance to draw the path
+        pathPaint = new Paint();
+        pathPaint.setStyle(Paint.Style.FILL);
+        pathPaint.setColor(Color.BLUE);
+        pathPaint.setAntiAlias(true);
+
+        path = new PathObject(pathDisplacement, pathPeriod, pathDetail, pathWidth, pathPaint, Constants.screenHeight, pathSineOffset);
     }
 
     @Override
@@ -76,13 +103,17 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     }
     
     public void update() {
+        player.update();
+        path.update();
     }
 
     @Override
     public void draw(Canvas canvas) {
+        Log.d("draw: ", "we got to draw!");
         super.draw(canvas);
         canvas.drawColor(0xff999999);
-        player.update();
+
+        path.draw(canvas);
         player.draw(canvas);
     }
 }
