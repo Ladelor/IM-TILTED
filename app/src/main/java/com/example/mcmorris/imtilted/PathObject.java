@@ -35,7 +35,7 @@ public class PathObject implements GameObject {
     private int pathSineOffset;
 
     //Determines speed at which path moves
-    private float pathSpeed = 5f;
+    private float pathSpeed = 10f;
 
     private ArrayList<PathRect> pathRects = new ArrayList<>();
 

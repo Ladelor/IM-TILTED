@@ -69,7 +69,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         pathPaint.setColor(Color.BLUE);
         pathPaint.setAntiAlias(true);
 
-        path = new PathObject(pathDisplacement, pathPeriod, pathDetail, pathWidth, 0xff00eeff, pathSineOffset);
+        path = new PathObject(pathDisplacement, pathPeriod, pathDetail, pathWidth, 0xff00ccff, pathSineOffset);
     }
 
     @Override
