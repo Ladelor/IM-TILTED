@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.TextView;
 
 /**
  * Created by Josh on 2/13/2018.
@@ -34,6 +35,8 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     private int pathWidth;
     private int pathSineOffset;
     private Paint pathPaint;
+
+    private int score = 0;
 
 
     public GameContent(Context context, AttributeSet attributeSet) {
@@ -57,8 +60,8 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         pathDisplacement = 0;
         pathPeriod = 150;       //TODO make this depend on screen pixel count
         pathDetail = 1;
-        pathWidth = (int) (Constants.screenWidth / 7.0);
-        pathSineOffset = (int) (Constants.screenWidth / 5.0);
+        pathWidth = (int) (Constants.screenWidth / 3.5);
+        pathSineOffset = (int) (Constants.screenWidth / 10.0);
 
         //Initialize a new Paint instance to draw the path
         pathPaint = new Paint();
@@ -66,7 +69,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         pathPaint.setColor(Color.BLUE);
         pathPaint.setAntiAlias(true);
 
-        path = new PathObject(pathDisplacement, pathPeriod, pathDetail, pathWidth, pathPaint, Constants.screenHeight, pathSineOffset);
+        path = new PathObject(pathDisplacement, pathPeriod, pathDetail, pathWidth, 0xff00eeff, pathSineOffset);
     }
 
     @Override
@@ -100,10 +103,12 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
         return super.onTouchEvent(event);
     }
-    
+
     public void update() {
         player.update();
         path.update();
+        path.playerCollide(player);
+        score += 1;
     }
 
     @Override
@@ -113,5 +118,9 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
 
         path.draw(canvas);
         player.draw(canvas);
+        Paint textPaint = new Paint();
+        textPaint.setColor(0xffff0000);
+        textPaint.setTextSize(70f);
+        canvas.drawText("Score: " + score, 10, 70, textPaint);
     }
 }
