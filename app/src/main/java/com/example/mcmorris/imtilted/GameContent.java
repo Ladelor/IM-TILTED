@@ -108,7 +108,9 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         player.update();
         path.update();
         path.playerCollide(player);
-        score += 1;
+        if (player.getAlive())
+            score += 1;
+
     }
 
     @Override
@@ -122,5 +124,9 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         textPaint.setColor(0xffff0000);
         textPaint.setTextSize(70f);
         canvas.drawText("Score: " + score, 10, 70, textPaint);
+    }
+
+    public int getScore() {
+        return score;
     }
 }

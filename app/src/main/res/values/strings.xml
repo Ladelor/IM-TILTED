@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">IM TILTED</string>
+    <string name="playB">Play</string>
+    <string name="highScoreTV">High Score: </string>
+
 </resources>
