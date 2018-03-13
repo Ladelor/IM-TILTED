@@ -27,14 +27,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main );
 
-
-
         gameContent = findViewById(R.id.GameContent);
 
 
-        mplayB = (Button) findViewById(R.id.playB);
-        mhighScoreTV = (TextView) findViewById(R.id.highScoreTV);
-        mhighScoreDisplayTV = (TextView) findViewById(R.id.highScoreDisplayTV);
+        mplayB = findViewById(R.id.playB);
+        mhighScoreTV = findViewById(R.id.highScoreTV);
+        mhighScoreDisplayTV = findViewById(R.id.highScoreDisplayTV);
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         highScore = sharedPref.getInt(Constants.highScore, highScore);
@@ -47,24 +45,13 @@ public class MainActivity extends AppCompatActivity {
                 mhighScoreTV.setVisibility(View.GONE);
                 mhighScoreDisplayTV.setVisibility(View.GONE);
 
-                gameContent.setVisibility(View.VISIBLE);
-
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                getWindow().getDecorView().setSystemUiVisibility(
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                //gameContent.setVisibility(View.VISIBLE);
+                gameContent.tiltManager.start();
             }
         });
-
-
-
     }
 
-    /*@Override
+    @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -77,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
-    }*/
+    }
 
     @Override
     public void onPause() {
@@ -92,8 +79,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        gameContent.tiltManager.start();
-        gameContent.player.resetTime();
+        gameContent.player.reset();
+
+        mplayB.setVisibility(View.VISIBLE);
+        mhighScoreTV.setVisibility(View.VISIBLE);
+        mhighScoreDisplayTV.setVisibility(View.VISIBLE);
+        gameContent.setVisibility(View.VISIBLE);
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         highScore = sharedPref.getInt(Constants.highScore, highScore);

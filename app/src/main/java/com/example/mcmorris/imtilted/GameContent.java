@@ -46,7 +46,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         setFocusable(true);
 
         tiltManager = new TiltManager(context);
-        tiltManager.start();
+        //tiltManager.start();
 
         Constants.resources = getResources();
 
@@ -54,6 +54,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         ((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(Constants.displayMetrics);
         Constants.screenHeight = Constants.displayMetrics.heightPixels;
         Constants.screenWidth = Constants.displayMetrics.widthPixels;
+
         player = new Player(new Point((Constants.screenWidth / 2), Constants.screenHeight - Constants.convertPxToDp(150)), tiltManager);
 
         //Initialize path data
@@ -107,7 +108,9 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     public void update() {
         player.update();
         path.update();
-        path.playerCollide(player);
+        if(path.playerCollide(player)) {
+
+        }
         if (player.getAlive())
             score += 1;
 

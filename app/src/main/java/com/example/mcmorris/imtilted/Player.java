@@ -49,8 +49,10 @@ public class Player implements GameObject {
     }
 
     //THIS NEEDS TO BE CALLED ON RESUME OR RIPPP PLAYER
-    void resetTime() {
+    void reset() {
         frameTime = -1;
+        playerPoint.x = (Constants.screenWidth - bitmap.getWidth()) / 2;
+        setAlive(true);
     }
 
     @Override
@@ -58,7 +60,7 @@ public class Player implements GameObject {
         if (!alive) {
             bitmap.setHeight((int)radius);
             bitmap.setWidth((int)radius);
-            radius += .00005f;
+            radius -= .00005f;
         }
         canvas.drawBitmap(bitmap, playerPoint.x, playerPoint.y, null);
     }
