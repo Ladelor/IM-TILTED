@@ -36,18 +36,21 @@ public class MainThread extends Thread {
         this.running = running;
     }
 
+    //TODO: This is where frame rate controls could be added
     @Override
     public void run() {
-        long startTime;
+        //long startTime;
+        //This is the game loop that repeats until the game is closed
         while(running) {
             //startTime = System.nanoTime();
-
             try {
                 canvas = this.surfaceHolder.lockCanvas();
+                //This is where update and draw are called for GameContent
                 synchronized (surfaceHolder) {
                     this.gameContent.update();
                     this.gameContent.draw(canvas);
                 }
+            //Hope this never happens
             } catch(Exception e) { e.printStackTrace(); }
             finally {
                 if(canvas != null)
@@ -57,14 +60,6 @@ public class MainThread extends Thread {
                     } catch(Exception e) { e.printStackTrace(); }
                 }
             }
-
         }
-
-
     }
-
-
-
-
-
 }

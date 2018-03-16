@@ -53,6 +53,8 @@ public class TiltManager implements SensorEventListener {
         sensorManager.unregisterListener(this);
     }
 
+    //Confusing code
+    //Reference https://www.youtube.com/watch?v=vqvJn4G3NMM
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
 

@@ -16,25 +16,32 @@ import android.graphics.Rect;
 public class Player implements GameObject {
 
     private Point playerPoint;
-    public Point getPlayerPoint() {
+
+    //Need to change stuff to get the center of the ball
+    Point getPlayerPoint() {
         float radius = bitmap.getWidth() / 2;
         return new Point((int)(playerPoint.x + radius), (int)(playerPoint.y + radius));
     }
 
+    //Giving this the tiltmanager makes life easier
     private TiltManager tiltManager;
+
+    //Frame time changes how far the player moves from tilt
+    //Makes game work with any frame rate/length
     private long frameTime;
     private Bitmap bitmap;
+
     //Arbitrary value
     //TODO: Allow the user to set this in settings??
     private float playerSpeed = 3.4f;
     float radius;
-    int originalPosX;
+    private int originalPosX;
 
     Boolean getAlive() {
         return alive;
     }
 
-    public void setAlive(Boolean alive) {
+    void setAlive(Boolean alive) {
         this.alive = alive;
     }
 
@@ -44,6 +51,9 @@ public class Player implements GameObject {
         this.playerPoint = playerStart;
         this.tiltManager = tiltManager;
         frameTime = -1;
+
+        //Deal with the texture, get radius from texture
+        //Texture needs to have edges trimmed of only alpha
         bitmap = BitmapFactory.decodeResource(Constants.resources, R.drawable.ball);
         radius = bitmap.getHeight() / 2;
         playerPoint.x -= bitmap.getWidth() / 2;
@@ -58,16 +68,19 @@ public class Player implements GameObject {
 
     @Override
     public void draw(Canvas canvas) {
+        /*
         if (!alive) {
-            /*bitmap.setHeight((int)radius);
+            bitmap.setHeight((int)radius);
             bitmap.setWidth((int)radius);
-            radius -= .00005f;*/
+            radius -= .00005f;
         }
+        */
         canvas.drawBitmap(bitmap, playerPoint.x, playerPoint.y, null);
     }
 
     @Override
     public void update() {
+        //Tilt movement
         if (frameTime == -1)
             frameTime = System.currentTimeMillis();
         else if (alive) {
@@ -77,24 +90,19 @@ public class Player implements GameObject {
                 //float roll = tiltManager.getTilt()[2] - tiltManager.getInitialTilt()[2];
                 float roll = tiltManager.getTilt()[2];
 
-                float movement = roll * playerSpeed;
-                playerPoint.x += movement * elapsedTime;
+                //float movement = roll * playerSpeed;
+                playerPoint.x += roll * elapsedTime * playerSpeed;
+
                 //These values shouldn't be possible anyway
                 if (playerPoint.x < 0)
                     playerPoint.x = 0;
                 if (playerPoint.x > Constants.screenWidth - bitmap.getWidth())
                     playerPoint.x = Constants.screenWidth - bitmap.getWidth();
-
-
             }
         }
     }
 
-    public void resetPos() {
+    void resetPos() {
         playerPoint.x = originalPosX;
     }
-
-
-
-
 }

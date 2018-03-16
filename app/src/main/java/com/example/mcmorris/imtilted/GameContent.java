@@ -31,19 +31,11 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     public TiltManager tiltManager;
     public PathObject path;
 
-    private double pathDisplacement;
-    private int pathPeriod;
-    private int pathDetail;
-    private int pathWidth;
-    private int pathSineOffset;
-    private Paint pathPaint;
-
     private MainActivityListener listener;
 
-
+    //TODO: Make score less bad
     private int score = 0;
     private boolean playing = false;
-
 
     public GameContent(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -65,25 +57,22 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
 
         player = new Player(new Point((Constants.screenWidth / 2), Constants.screenHeight - Constants.convertPxToDp(150)), tiltManager);
 
-        //Initialize path data
-        pathDisplacement = 0;
-        pathPeriod = 150;       //TODO make this depend on screen pixel count
-        pathDetail = 1;
-        pathWidth = (int) (Constants.screenWidth / 3.5);
-        pathSineOffset = (int) (Constants.screenWidth / 10.0);
+        //Initialize Path Data
+        double pathDisplacement = 0;
+        int pathPeriod = Constants.screenHeight / 8;
+        //This is basically path rect height
+        int pathDetail = 2;
+        int pathWidth = (int) (Constants.screenWidth / 3.5);
+        int pathSineOffset = (int) (Constants.screenWidth / 10.0);
 
-        //Initialize a new Paint instance to draw the path
-        pathPaint = new Paint();
-        pathPaint.setStyle(Paint.Style.FILL);
-        pathPaint.setColor(Color.BLUE);
-        pathPaint.setAntiAlias(true);
-
+        //Practically everything is taken care of in the path, this is probably not great and a bit speghetti
         path = new PathObject(pathDisplacement, pathPeriod, pathDetail, pathWidth, 0xff00ccff, pathSineOffset);
         Log.d(Constants.Tag, "onCreate called" );
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        //Make and start the thread for the SurfaceView
         thread = new MainThread(getHolder(), this);
         thread.setRunning(true);
         thread.start();
@@ -100,6 +89,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         boolean stillOpen = true;
+        //Close the thread so the world doesn't explode
         while(stillOpen) {
             try {
                 thread.setRunning(false);
@@ -117,6 +107,8 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     public void update() {
         player.update();
         path.update();
+        //This is where we check if the player collided
+        //Maybe not organized the best
         if(path.playerCollide(player)) {
             player.resetPos();
             setPlaying(false);
@@ -127,6 +119,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
                 tiltManager.stop();
             }
         }
+        //Again, make score less bad
         if (player.getAlive() && playing)
             score += 1;
     }
@@ -136,6 +129,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+        //TODO: Make all of this better, a class for background and score or something
         canvas.drawColor(0xff999999);
 
         path.draw(canvas);
@@ -161,7 +155,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     public interface MainActivityListener {
         // These methods are the different events and
         // need to pass relevant arguments related to the event triggered
-        public void onPlayerDead(Boolean dead);
+        void onPlayerDead(Boolean dead);
     }
 
     // Assign the listener implementing events interface that will receive the events

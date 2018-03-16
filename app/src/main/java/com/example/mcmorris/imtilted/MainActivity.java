@@ -15,13 +15,12 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    //The views of the app
     public Button mplayB;
     private TextView mhighScoreTV;
     private TextView mhighScoreDisplayTV;
     private TextView mTitleTV;
     private int highScore;
-
-
     private GameContent gameContent;
 
     @Override
@@ -31,16 +30,17 @@ public class MainActivity extends AppCompatActivity {
 
         gameContent = findViewById(R.id.GameContent);
 
-
         mplayB = findViewById(R.id.playB);
         mhighScoreTV = findViewById(R.id.highScoreTV);
         mhighScoreDisplayTV = findViewById(R.id.highScoreDisplayTV);
         mTitleTV = findViewById(R.id.titleText);
 
+        //High score code
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         highScore = sharedPref.getInt(Constants.highScore, highScore);
         mhighScoreDisplayTV.setText("" + highScore);
 
+        //Play button click
         mplayB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Code to force vertical and otherwise display like we want
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -78,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    //Turns out stuff works on app close/reopen without messing with this
+    //We either programmed well or got lucky
     @Override
     public void onPause() {
         super.onPause();
@@ -98,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
+        //This is needed to not let the player move when the app is closed from the menu then reopened
+        //Maybe fix the spaghetti that causes this
         if(gameContent.player.getAlive())
             gameContent.player.reset();
 
@@ -110,12 +114,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //Function that deals with displaying or not displaying the menu to start the game
     public void menuOrNo(Boolean menu) {
         if (menu) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     //gameContent.setVisibility(View.GONE);
+
                     mplayB.setVisibility(View.VISIBLE);
                     mhighScoreTV.setVisibility(View.VISIBLE);
                     mhighScoreDisplayTV.setVisibility(View.VISIBLE);
@@ -138,5 +144,4 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.d(Constants.Tag, "menuOrNo Called");
     }
-
 }

@@ -7,6 +7,7 @@ import android.graphics.RectF;
 
 /**
  * Created by Josh on 3/6/2018.
+ * This is what the path is made of
  */
 
 class PathRect implements GameObject {
@@ -30,7 +31,7 @@ class PathRect implements GameObject {
     public void update() {
     }
 
-    public void update(float pathSpeed) {
+    void update(float pathSpeed) {
         pathRect.bottom += pathSpeed;
         pathRect.top += pathSpeed;
         //pathRect.set(pathRect.left, pathRect.top + pathSpeed, pathRect.right, pathRect.bottom + pathSpeed);

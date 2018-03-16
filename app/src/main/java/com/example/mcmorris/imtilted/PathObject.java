@@ -10,6 +10,7 @@ import android.util.Log;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Daniel on 3/6/2018.
@@ -40,22 +41,30 @@ public class PathObject implements GameObject {
     //Determines speed at which path moves
     private float pathSpeed = 10f;
 
+    //The whole path is just a ton of rectangles
+    //Makes it look good and easy to deal with
     private ArrayList<PathRect> pathRects = new ArrayList<>();
 
     private int centerScreen = Constants.screenWidth / 2;
 
+    //This is garbage. To get the initial path loaded, start this at screenheight
+    //Go down to 0 then go into negatives to get the sine to keep working
     private int yPosition;
 
+    //Used to get color to go back and forth
     private int colorSwitch = -1;
 
     private Random random = new Random();
 
-    private ArrayList<Obstacle> pathObstacles = new ArrayList<>();
+    //List with all the obstacles
+    //This weird class helps it not throw errors when removing obstacles in the for loop
+    private CopyOnWriteArrayList<Obstacle> pathObstacles = new CopyOnWriteArrayList<>();
 
+    //Relatively arbitrary values to determine difficulty of the obstacles
     private int obstacleSize;
     private int obstacleFrequency;
 
-    public void setPlaying(boolean playing) {
+    void setPlaying(boolean playing) {
         this.playing = playing;
     }
 
@@ -72,6 +81,7 @@ public class PathObject implements GameObject {
 
         for(yPosition = Constants.screenHeight; yPosition >= 0; yPosition -= pathDetail)
         {
+            //Sine is very picky, getting it to look clean takes alot
             int pathCenter = centerScreen + (int)(this.pathSineOffset * Math.sin(((double) yPosition / this.pathPeriod)) + this.pathDisplacement);
             pathRects.add(new PathRect(new RectF(pathCenter - this.pathWidth, yPosition, pathCenter + this.pathWidth,
                     yPosition + this.pathDetail), this.pathColor));
@@ -90,10 +100,12 @@ public class PathObject implements GameObject {
 
     @Override
     public void update () {
-        float offset = pathSpeed;
-        pathColor += 1 * colorSwitch;
+        //The code changing the color
+        //A bit rough in the end but its fun
+        pathColor += colorSwitch;
         if (pathColor % 256  == 0) {
             colorSwitch *= -1;
+            //Through in obstacle difficulty here because it works
             obstacleFrequency /= 1.1;
             //obstacleSize += 2;
             if (colorSwitch == -1)
@@ -102,36 +114,41 @@ public class PathObject implements GameObject {
                 pathColor += 2;
         }
 
+        //variable to deal with drawing multiple rects a frame
+        float offset = pathSpeed;
+
         for (int i = 0; i < pathRects.size(); i++) {
             pathRects.get(i).update(pathSpeed);
 
+            //If a pathRect is off the screen, create new ones
             if(pathRects.get(i).pathRect.top > Constants.screenHeight) {
                 float pathCenter = centerScreen + (float)(pathSineOffset * Math.sin(((double) yPosition / pathPeriod)) + pathDisplacement);
-                pathRects.set(i, new PathRect(new RectF((float)(pathCenter - pathWidth), (float)offset, (float)(pathCenter
-                        + pathWidth), (float)(offset + pathDetail)), pathColor));
+                pathRects.set(i, new PathRect(new RectF(pathCenter - pathWidth, offset, pathCenter
+                        + pathWidth, offset + pathDetail), pathColor));
 
+                //Obstacle spawning
+                //TODO: Better obstacle spanwing/manipulation
                 if (playing) {
                     if (random.nextInt(obstacleFrequency) % obstacleFrequency == 1) {
                         int obstaclePos = random.nextInt((2 * pathWidth) - obstacleSize);
                         pathObstacles.add(new Obstacle(new Rect((int) pathCenter - pathWidth + obstaclePos, 0 - obstacleSize,
-                                (int) (pathCenter + obstaclePos - pathWidth + obstacleSize), 0), 0xffff0099, pathSpeed));
+                                (int) (pathCenter + obstaclePos - pathWidth + obstacleSize), 0), 0xffff0099));
                     }
                 }
 
                 yPosition -= pathDetail;
                 offset -= pathDetail;
             }
-
         }
 
         for(Obstacle obstacle : pathObstacles)
-            obstacle.update();
+            obstacle.update(pathSpeed);
     }
 
-    void resetObstacles() {
+    private void resetObstacles() {
         pathObstacles.clear();
         obstacleSize = 60;
-        obstacleFrequency = 300;
+        obstacleFrequency = 200;
     }
 
     Boolean playerCollide(Player player){
@@ -142,6 +159,10 @@ public class PathObject implements GameObject {
                     return playerDead(player);
 
         for (Obstacle obstacle : pathObstacles) {
+
+            //Quick optimization for if the bottom of the obstacle is higher than the top of the player
+            if (obstacle.rect.bottom < player.getPlayerPoint().y - player.radius)
+                continue;
             //Bottom-left of obstacle to player
             if ( Constants.collidePointCircle(new Point(obstacle.rect.left, obstacle.rect.bottom), player.getPlayerPoint(), player.radius))
                 return playerDead(player);
@@ -159,11 +180,16 @@ public class PathObject implements GameObject {
             //Right of player to Obstacle
             if ( Constants.collidePointRect(new Point((int)(player.getPlayerPoint().x + player.radius), player.getPlayerPoint().y), obstacle.rect))
                 return playerDead(player);
+
+            //Delete the obstacle if its offscreen
+            if ( obstacle.rect.top > Constants.screenHeight)
+                pathObstacles.remove(obstacle);
         }
+        //There was no collision
         return false;
     }
 
-    boolean playerDead(Player player) {
+    private boolean playerDead(Player player) {
         player.setAlive(false);
         Log.d(Constants.Tag, "ded");
         resetObstacles();
