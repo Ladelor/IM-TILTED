@@ -16,6 +16,7 @@ class Constants {
     static DisplayMetrics displayMetrics;
     static Resources resources;
     static String highScore = "hS";
+    static String Tag = "IM_TILTED";
 
     static int convertPxToDp(int pixels) {
         return (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP, pixels, displayMetrics );

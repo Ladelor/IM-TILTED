@@ -15,6 +15,8 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -24,7 +26,7 @@ import android.widget.TextView;
  */
 
 public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
-    private MainThread thread;
+    public MainThread thread;
     public Player player;
     public TiltManager tiltManager;
     public PathObject path;
@@ -36,7 +38,11 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     private int pathSineOffset;
     private Paint pathPaint;
 
+    private MainActivityListener listener;
+
+
     private int score = 0;
+    private boolean playing = false;
 
 
     public GameContent(Context context, AttributeSet attributeSet) {
@@ -45,8 +51,10 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         //thread = new MainThread(getHolder(), this);
         setFocusable(true);
 
+        this.listener = null;
+
         tiltManager = new TiltManager(context);
-        tiltManager.start();
+        //tiltManager.start();
 
         Constants.resources = getResources();
 
@@ -54,6 +62,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         ((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(Constants.displayMetrics);
         Constants.screenHeight = Constants.displayMetrics.heightPixels;
         Constants.screenWidth = Constants.displayMetrics.widthPixels;
+
         player = new Player(new Point((Constants.screenWidth / 2), Constants.screenHeight - Constants.convertPxToDp(150)), tiltManager);
 
         //Initialize path data
@@ -70,6 +79,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         pathPaint.setAntiAlias(true);
 
         path = new PathObject(pathDisplacement, pathPeriod, pathDetail, pathWidth, 0xff00ccff, pathSineOffset);
+        Log.d(Constants.Tag, "onCreate called" );
     }
 
     @Override
@@ -107,9 +117,18 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
     public void update() {
         player.update();
         path.update();
-        path.playerCollide(player);
-        if (player.getAlive())
+        if(path.playerCollide(player)) {
+            player.resetPos();
+            Log.d(Constants.Tag, "Player dead in update");
+            if(listener != null) {
+                //Communicates to the MainActivity that the player has died
+                listener.onPlayerDead(true);
+                tiltManager.stop();
+            }
+        }
+        if (player.getAlive() && playing)
             score += 1;
+
 
     }
 
@@ -128,5 +147,23 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
 
     public int getScore() {
         return score;
+    }
+
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
+    //Utilizing much of https://guides.codepath.com/android/Creating-Custom-Listeners
+    //This interface defines the type of messages I want to communicate to my owner
+    public interface MainActivityListener {
+        // These methods are the different events and
+        // need to pass relevant arguments related to the event triggered
+        public void onPlayerDead(Boolean dead);
+    }
+
+    // Assign the listener implementing events interface that will receive the events
+    public void setMainActivityListener(MainActivityListener listener) {
+        this.listener = listener;
     }
 }
