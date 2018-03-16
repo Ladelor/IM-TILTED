@@ -27,7 +27,7 @@ public class Player implements GameObject {
     //Arbitrary value
     //TODO: Allow the user to set this in settings??
     private float playerSpeed = 3.4f;
-    private float radius;
+    float radius;
     int originalPosX;
 
     Boolean getAlive() {
@@ -45,15 +45,15 @@ public class Player implements GameObject {
         this.tiltManager = tiltManager;
         frameTime = -1;
         bitmap = BitmapFactory.decodeResource(Constants.resources, R.drawable.ball);
-        radius = bitmap.getHeight();
+        radius = bitmap.getHeight() / 2;
         playerPoint.x -= bitmap.getWidth() / 2;
         originalPosX = playerPoint.x;
     }
 
     //THIS NEEDS TO BE CALLED ON RESUME OR RIPPP PLAYER
     void reset() {
-        playerPoint.x = (Constants.screenWidth - bitmap.getWidth()) / 2;
         setAlive(true);
+        frameTime = -1;
     }
 
     @Override
@@ -92,7 +92,6 @@ public class Player implements GameObject {
 
     public void resetPos() {
         playerPoint.x = originalPosX;
-        frameTime = -1;
     }
 
 

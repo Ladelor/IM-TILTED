@@ -119,6 +119,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         path.update();
         if(path.playerCollide(player)) {
             player.resetPos();
+            setPlaying(false);
             Log.d(Constants.Tag, "Player dead in update");
             if(listener != null) {
                 //Communicates to the MainActivity that the player has died
@@ -128,9 +129,9 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
         }
         if (player.getAlive() && playing)
             score += 1;
-
-
     }
+
+    public void resetScore(){ score = 0; }
 
     @Override
     public void draw(Canvas canvas) {
@@ -152,6 +153,7 @@ public class GameContent extends SurfaceView implements SurfaceHolder.Callback {
 
     public void setPlaying(boolean playing) {
         this.playing = playing;
+        path.setPlaying(playing);
     }
 
     //Utilizing much of https://guides.codepath.com/android/Creating-Custom-Listeners
