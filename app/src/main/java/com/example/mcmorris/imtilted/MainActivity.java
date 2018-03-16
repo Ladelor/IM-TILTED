@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,7 +15,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button mplayB;
+    public Button mplayB;
     private TextView mhighScoreTV;
     private TextView mhighScoreDisplayTV;
     private int highScore;
@@ -41,14 +42,26 @@ public class MainActivity extends AppCompatActivity {
         mplayB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mplayB.setVisibility(View.GONE);
-                mhighScoreTV.setVisibility(View.GONE);
-                mhighScoreDisplayTV.setVisibility(View.GONE);
 
-                //gameContent.setVisibility(View.VISIBLE);
+                menuOrNo(false);
+                gameContent.setPlaying(true);
                 gameContent.tiltManager.start();
+                gameContent.player.setAlive(true);
             }
         });
+
+        //Custom listener to act when the thread stops/player dies
+        gameContent.setMainActivityListener(new GameContent.MainActivityListener() {
+            @Override
+            public void onPlayerDead(Boolean dead) {
+                Log.d(Constants.Tag, "Dead listener called");
+                menuOrNo(true);
+
+            }
+        });
+
+
+
     }
 
     @Override
@@ -66,14 +79,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     public void onPause() {
         super.onPause();
         gameContent.tiltManager.stop();
         highScore = (highScore > gameContent.getScore() ? highScore : gameContent.getScore());
+
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(Constants.highScore, highScore);
+        editor.apply();
+        Log.d(Constants.Tag, "onPause values: " + gameContent.getScore() + ", " + highScore);
     }
 
     @Override
@@ -81,16 +98,30 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         gameContent.player.reset();
 
-        mplayB.setVisibility(View.VISIBLE);
-        mhighScoreTV.setVisibility(View.VISIBLE);
-        mhighScoreDisplayTV.setVisibility(View.VISIBLE);
-        gameContent.setVisibility(View.VISIBLE);
+        menuOrNo(true);
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         highScore = sharedPref.getInt(Constants.highScore, highScore);
         mhighScoreDisplayTV.setText("" + highScore);
+        Log.d(Constants.Tag, "onResume values: " + gameContent.getScore() + ", " + highScore);
 
     }
 
+    public void menuOrNo(Boolean menu) {
+        if (menu) {
+            gameContent.setVisibility(View.GONE);
+            mplayB.setVisibility(View.VISIBLE);
+            mhighScoreTV.setVisibility(View.VISIBLE);
+            mhighScoreDisplayTV.setVisibility(View.VISIBLE);
+
+        } else {
+            mplayB.setVisibility(View.GONE);
+            mhighScoreTV.setVisibility(View.GONE);
+            mhighScoreDisplayTV.setVisibility(View.GONE);
+
+            gameContent.setVisibility(View.VISIBLE);
+        }
+        Log.d(Constants.Tag, "menuOrNo Called");
+    }
 
 }

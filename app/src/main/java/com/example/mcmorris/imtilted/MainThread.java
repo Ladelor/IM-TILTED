@@ -1,7 +1,10 @@
 package com.example.mcmorris.imtilted;
 
 import android.graphics.Canvas;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.SurfaceHolder;
+import android.view.View;
 
 /**
  * Created by Josh on 2/13/2018.
@@ -16,10 +19,17 @@ public class MainThread extends Thread {
     private boolean running;
     private static Canvas canvas;
 
+    // This variable represents the listener passed in by the owning object
+    // The listener must implement the events interface and passes messages up to the parent.
+
+
+
     MainThread(SurfaceHolder surfaceHolder, GameContent gameContent) {
         super();
         this.surfaceHolder = surfaceHolder;
         this.gameContent = gameContent;
+        // set null or default listener or accept as argument to constructor
+
     }
 
     void setRunning(boolean running) {
@@ -49,6 +59,12 @@ public class MainThread extends Thread {
             }
 
         }
+
+
     }
+
+
+
+
 
 }

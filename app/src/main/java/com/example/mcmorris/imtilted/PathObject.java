@@ -98,9 +98,12 @@ public class PathObject implements GameObject {
     Boolean playerCollide(Player player){
         for (PathRect pathRect : pathRects) {
             if (pathRect.pathRect.bottom >= player.getPlayerPoint().y && pathRect.pathRect.top <= player.getPlayerPoint().y) {
-                if (pathRect.pathRect.left >= player.getPlayerPoint().x || pathRect.pathRect.right <= player.getPlayerPoint().x)
+                if (pathRect.pathRect.left >= player.getPlayerPoint().x || pathRect.pathRect.right <= player.getPlayerPoint().x) {
                     player.setAlive(false);
-                return true;
+                    Log.d(Constants.Tag, "ded");
+                    return true;
+                }
+
             }
         }
         return false;

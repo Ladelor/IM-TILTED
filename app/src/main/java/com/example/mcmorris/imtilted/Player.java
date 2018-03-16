@@ -28,6 +28,7 @@ public class Player implements GameObject {
     //TODO: Allow the user to set this in settings??
     private float playerSpeed = 3.4f;
     private float radius;
+    int originalPosX;
 
     Boolean getAlive() {
         return alive;
@@ -37,7 +38,7 @@ public class Player implements GameObject {
         this.alive = alive;
     }
 
-    private Boolean alive = true;
+    private Boolean alive = false;
 
     Player(Point playerStart, TiltManager tiltManager) {
         this.playerPoint = playerStart;
@@ -46,11 +47,11 @@ public class Player implements GameObject {
         bitmap = BitmapFactory.decodeResource(Constants.resources, R.drawable.ball);
         radius = bitmap.getHeight();
         playerPoint.x -= bitmap.getWidth() / 2;
+        originalPosX = playerPoint.x;
     }
 
     //THIS NEEDS TO BE CALLED ON RESUME OR RIPPP PLAYER
     void reset() {
-        frameTime = -1;
         playerPoint.x = (Constants.screenWidth - bitmap.getWidth()) / 2;
         setAlive(true);
     }
@@ -58,9 +59,9 @@ public class Player implements GameObject {
     @Override
     public void draw(Canvas canvas) {
         if (!alive) {
-            bitmap.setHeight((int)radius);
+            /*bitmap.setHeight((int)radius);
             bitmap.setWidth((int)radius);
-            radius -= .00005f;
+            radius -= .00005f;*/
         }
         canvas.drawBitmap(bitmap, playerPoint.x, playerPoint.y, null);
     }
@@ -69,10 +70,10 @@ public class Player implements GameObject {
     public void update() {
         if (frameTime == -1)
             frameTime = System.currentTimeMillis();
-        else {
+        else if (alive) {
             long elapsedTime = System.currentTimeMillis() - frameTime;
             frameTime = System.currentTimeMillis();
-            if (tiltManager.getTilt() != null && tiltManager.getInitialTilt() != null) {
+            if (tiltManager.getTilt() != null) {
                 //float roll = tiltManager.getTilt()[2] - tiltManager.getInitialTilt()[2];
                 float roll = tiltManager.getTilt()[2];
 
@@ -87,6 +88,11 @@ public class Player implements GameObject {
 
             }
         }
+    }
+
+    public void resetPos() {
+        playerPoint.x = originalPosX;
+        frameTime = -1;
     }
 
 
